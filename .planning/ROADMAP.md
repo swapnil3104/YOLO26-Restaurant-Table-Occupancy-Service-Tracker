@@ -3,7 +3,7 @@
 ## Milestone 0: Feasibility & Foundation (Phases 0-2)
 - [x] **Phase 0: Repository and Engineering Setup** - Project configs, environment variables, dependencies, test suite, and frontend scaffold.
 - [x] **Phase 1: Model and Video Feasibility** - Video ingestion pipeline, OpenCV capture, YOLO detector adapter, frame normalization, inference benchmarking.
-- [ ] **Phase 2: Tracking Adapter** - ByteTrack / BoT-SORT integration, track persistence across adjacent frames, occlusion tolerance, and track ID limitation handling.
+- [x] **Phase 2: Tracking Adapter** - ByteTrack / BoT-SORT integration, track persistence across adjacent frames, occlusion tolerance, and track ID limitation handling.
 
 
 ## Milestone 1: Occupancy MVP (Phases 3-4)
@@ -55,9 +55,9 @@
 **Depends on:** Phase 1
 **Requirements:** FR-02
 **Success Criteria:**
-- [ ] A moving person is tracked through a short clip.
-- [ ] Track IDs are preserved across short occlusions and documented as temporary.
-- [ ] Tracker behavior and ID-switch limitations are documented.
+- [x] A moving person is tracked through a short clip.
+- [x] Track IDs are preserved across short occlusions and documented as temporary.
+- [x] Tracker behavior and ID-switch limitations are documented.
 
 ### Phase 3: Table Layout and Association
 **Goal:** Implement normalized polygon table configurations and point-in-polygon association with ambiguity handling.

@@ -1,6 +1,7 @@
 """Tests for health and metadata endpoints."""
 
 from fastapi.testclient import TestClient
+
 from smartserve.main import app
 
 client = TestClient(app)

@@ -1,7 +1,7 @@
 """WebSocket connection manager for real-time dashboard events."""
 
 import logging
-from typing import List
+
 from fastapi import WebSocket
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ class ConnectionManager:
     """Manages active WebSocket client connections for real-time broadcast."""
 
     def __init__(self) -> None:
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket) -> None:
         """Accept and register a new client connection."""

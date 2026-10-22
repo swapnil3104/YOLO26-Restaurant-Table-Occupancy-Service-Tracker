@@ -1,7 +1,6 @@
 """Application configuration using Pydantic Settings."""
 
-from typing import List
-from pydantic import Field
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,7 +21,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
     SECRET_KEY: str = "default-insecure-dev-secret-key-change-in-production"
-    ALLOWED_CORS_ORIGINS: List[str] = [
+    ALLOWED_CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
@@ -46,7 +45,7 @@ class Settings(BaseSettings):
     DETECTOR_PROVIDER: str = "ultralytics"
     MODEL_WEIGHTS_PATH: str = "yolo11n.pt"
     DETECTION_CONFIDENCE_THRESHOLD: float = 0.45
-    DETECTION_CLASSES: List[str] = ["person"]
+    DETECTION_CLASSES: list[str] = ["person"]
     TRACKER_TYPE: str = "bytetrack"
     TRACKER_MAX_AGE_FRAMES: int = 30
 

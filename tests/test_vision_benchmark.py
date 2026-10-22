@@ -1,6 +1,5 @@
 """Tests for vision benchmarking suite."""
 
-import pytest
 
 from smartserve.vision.benchmark import BenchmarkResult, benchmark_detector
 from smartserve.vision.detector import MockDetector

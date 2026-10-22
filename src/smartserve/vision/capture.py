@@ -4,13 +4,13 @@ Supports local video files, webcams, and RTSP streams with rate limiting,
 metadata enrichment (timestamps, camera ID), and actionable error handling.
 """
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from enum import Enum
 import logging
 import os
 import time
-from typing import Generator, Optional, Union
+from collections.abc import Generator
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from enum import StrEnum
 
 import cv2
 import numpy as np
@@ -18,7 +18,7 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-class CameraStatus(str, Enum):
+class CameraStatus(StrEnum):
     """Camera connection status."""
 
     UNINITIALIZED = "UNINITIALIZED"
@@ -76,9 +76,9 @@ class VideoCapturePipeline:
 
     def __init__(
         self,
-        source: Union[str, int],
+        source: str | int,
         camera_id: str = "CAM-01",
-        sample_rate_hz: Optional[float] = 5.0,
+        sample_rate_hz: float | None = 5.0,
         max_reconnect_attempts: int = 5,
         reconnect_delay_sec: float = 1.0,
     ) -> None:
@@ -98,7 +98,7 @@ class VideoCapturePipeline:
         self.max_reconnect_attempts = max_reconnect_attempts
         self.reconnect_delay_sec = reconnect_delay_sec
 
-        self._cap: Optional[cv2.VideoCapture] = None
+        self._cap: cv2.VideoCapture | None = None
         self._status = CameraStatus.UNINITIALIZED
         self._frame_count = 0
         self._last_sampled_timestamp = 0.0
@@ -171,7 +171,7 @@ class VideoCapturePipeline:
             f"after {self.max_reconnect_attempts} attempts."
         )
 
-    def read_frame(self) -> Optional[FramePacket]:
+    def read_frame(self) -> FramePacket | None:
         """Read the next frame with rate-limiting and metadata tagging.
 
         Returns:
@@ -191,7 +191,7 @@ class VideoCapturePipeline:
         while True:
             ret, frame = self._cap.read()
             now_mono = time.monotonic()
-            now_utc = datetime.now(timezone.utc)
+            now_utc = datetime.now(UTC)
 
             if not ret or frame is None:
                 # Distinguish between file EOF and stream disconnect

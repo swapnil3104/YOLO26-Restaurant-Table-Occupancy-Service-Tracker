@@ -17,7 +17,19 @@ from smartserve.vision.detector import (
     normalize_coordinates,
 )
 from smartserve.vision.interfaces import BaseDetector, BaseTracker, BoundingBox, Detection
-from smartserve.vision.visualizer import draw_detection_overlay
+from smartserve.vision.tracker import (
+    MockTracker,
+    SimpleByteTracker,
+    TrackedObject,
+    TrackState,
+    YOLO26Tracker,
+    calculate_iou,
+)
+from smartserve.vision.visualizer import (
+    draw_detection_overlay,
+    draw_tracking_overlay,
+    get_track_color,
+)
 
 __all__ = [
     "BaseDetector",
@@ -30,12 +42,20 @@ __all__ = [
     "FramePacket",
     "InvalidFrameError",
     "MockDetector",
+    "MockTracker",
+    "SimpleByteTracker",
+    "TrackState",
+    "TrackedObject",
     "VideoCaptureError",
     "VideoCapturePipeline",
     "VideoSourceNotFoundError",
     "YOLO26Detector",
+    "YOLO26Tracker",
     "benchmark_detector",
+    "calculate_iou",
     "denormalize_box",
     "draw_detection_overlay",
+    "draw_tracking_overlay",
+    "get_track_color",
     "normalize_coordinates",
 ]

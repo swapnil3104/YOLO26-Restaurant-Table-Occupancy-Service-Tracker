@@ -4,10 +4,10 @@ Measures detector warmup, throughput (FPS), percentile latencies (p50, p95, p99)
 and formats results for engineering and pilot documentation.
 """
 
-from dataclasses import dataclass, field
 import platform
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import Any
 
 import numpy as np
 
@@ -20,7 +20,7 @@ class BenchmarkResult:
 
     detector_name: str
     total_frames: int
-    resolution: Tuple[int, int]
+    resolution: tuple[int, int]
     warmup_frames: int
     total_time_sec: float
     fps: float
@@ -30,9 +30,9 @@ class BenchmarkResult:
     p99_latency_ms: float
     min_latency_ms: float
     max_latency_ms: float
-    hardware_info: Dict[str, str] = field(default_factory=dict)
+    hardware_info: dict[str, str] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary."""
         return {
             "detector_name": self.detector_name,
@@ -63,7 +63,7 @@ class BenchmarkResult:
         return "\n".join(lines)
 
 
-def get_system_hardware_info() -> Dict[str, str]:
+def get_system_hardware_info() -> dict[str, str]:
     """Capture current hardware and OS platform specifications."""
     info = {
         "os": f"{platform.system()} {platform.release()}",
@@ -86,9 +86,9 @@ def get_system_hardware_info() -> Dict[str, str]:
 def benchmark_detector(
     detector: BaseDetector,
     num_frames: int = 50,
-    frame_shape: Tuple[int, int] = (720, 1280),
+    frame_shape: tuple[int, int] = (720, 1280),
     warmup_frames: int = 5,
-    test_frame: Optional[np.ndarray] = None,
+    test_frame: np.ndarray | None = None,
 ) -> BenchmarkResult:
     """Run an inference benchmark against a detector.
 
@@ -117,7 +117,7 @@ def benchmark_detector(
         _ = detector.detect(frame)
 
     # Timed runs
-    latencies_sec: List[float] = []
+    latencies_sec: list[float] = []
     total_start = time.perf_counter()
 
     for _ in range(num_frames):

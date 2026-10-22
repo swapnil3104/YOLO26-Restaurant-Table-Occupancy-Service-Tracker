@@ -1,10 +1,12 @@
 """Main FastAPI application entrypoint."""
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+
 from smartserve import __version__
 from smartserve.api.routes.health import router as health_router
 from smartserve.api.websocket import manager

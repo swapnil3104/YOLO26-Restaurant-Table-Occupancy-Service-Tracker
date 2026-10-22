@@ -6,7 +6,7 @@ and business logic, satisfying architecture requirements.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 
 @dataclass
@@ -20,12 +20,12 @@ class BoundingBox:
     is_normalized: bool = True
 
     @property
-    def center_point(self) -> Tuple[float, float]:
+    def center_point(self) -> tuple[float, float]:
         """Return (cx, cy)."""
         return ((self.x1 + self.x2) / 2.0, (self.y1 + self.y2) / 2.0)
 
     @property
-    def bottom_center(self) -> Tuple[float, float]:
+    def bottom_center(self) -> tuple[float, float]:
         """Return (cx, y2) representing person feet / table contact anchor."""
         return ((self.x1 + self.x2) / 2.0, self.y2)
 
@@ -37,15 +37,15 @@ class Detection:
     class_name: str
     confidence: float
     bbox: BoundingBox
-    track_id: Optional[int] = None
-    metadata: Optional[dict] = None
+    track_id: int | None = None
+    metadata: dict | None = None
 
 
 class BaseDetector(ABC):
     """Abstract detector interface independent of concrete deep learning frameworks."""
 
     @abstractmethod
-    def detect(self, frame: Any) -> List[Detection]:
+    def detect(self, frame: Any) -> list[Detection]:
         """Run object detection on an input image/frame.
 
         Args:
@@ -61,7 +61,7 @@ class BaseTracker(ABC):
     """Abstract tracker interface for multi-object tracking."""
 
     @abstractmethod
-    def update(self, detections: List[Detection], frame: Any) -> List[Detection]:
+    def update(self, detections: list[Detection], frame: Any) -> list[Detection]:
         """Associate detections with temporary track IDs across frames.
 
         Args:

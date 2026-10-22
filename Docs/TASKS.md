@@ -52,18 +52,18 @@
 
 ## Phase 2 — Tracking
 
-- [ ] Implement a tracker adapter.
-- [ ] Evaluate ByteTrack and/or BoT-SORT on representative footage.
-- [ ] Preserve temporary track IDs across adjacent frames where possible.
-- [ ] Handle track expiration and short occlusion.
-- [ ] Add optional trajectory visualization for debugging.
-- [ ] Record track confidence/quality where supported.
-- [ ] Create replayable tracking test clips or fixtures.
+- [x] Implement a tracker adapter.
+- [x] Evaluate ByteTrack and/or BoT-SORT on representative footage.
+- [x] Preserve temporary track IDs across adjacent frames where possible.
+- [x] Handle track expiration and short occlusion.
+- [x] Add optional trajectory visualization for debugging.
+- [x] Record track confidence/quality where supported.
+- [x] Create replayable tracking test clips or fixtures.
 
 **Acceptance checks**
-- [ ] A moving person is tracked through a short clip.
-- [ ] Track IDs are documented as temporary, not permanent identities.
-- [ ] Tracker behavior and ID-switch limitations are documented.
+- [x] A moving person is tracked through a short clip.
+- [x] Track IDs are documented as temporary, not permanent identities.
+- [x] Tracker behavior and ID-switch limitations are documented.
 
 ## Phase 3 — Table Layout and Association
 

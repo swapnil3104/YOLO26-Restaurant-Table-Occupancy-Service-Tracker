@@ -6,7 +6,8 @@ Includes:
 """
 
 import logging
-from typing import Any, List, Optional, Sequence, Union
+from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 
@@ -77,8 +78,8 @@ class YOLO26Detector(BaseDetector):
         self,
         model_path: str = "yolo11n.pt",
         confidence_threshold: float = 0.45,
-        target_classes: Optional[Sequence[Union[str, int]]] = None,
-        device: Optional[str] = None,
+        target_classes: Sequence[str | int] | None = None,
+        device: str | None = None,
     ) -> None:
         """Initialize YOLO26Detector.
 
@@ -92,7 +93,7 @@ class YOLO26Detector(BaseDetector):
         self.confidence_threshold = float(confidence_threshold)
         self.target_classes = list(target_classes) if target_classes else ["person"]
         self.device = device
-        self._model: Optional[Any] = None
+        self._model: Any | None = None
 
     def _ensure_loaded(self) -> Any:
         """Lazy load the underlying model."""
@@ -113,7 +114,7 @@ class YOLO26Detector(BaseDetector):
                 ) from exc
         return self._model
 
-    def detect(self, frame: Any) -> List[Detection]:
+    def detect(self, frame: Any) -> list[Detection]:
         """Run object detection on an OpenCV frame.
 
         Args:
@@ -144,7 +145,7 @@ class YOLO26Detector(BaseDetector):
             verbose=False,
         )
 
-        detections: List[Detection] = []
+        detections: list[Detection] = []
         if not results:
             return detections
 
@@ -196,7 +197,7 @@ class YOLO26Detector(BaseDetector):
 class MockDetector(BaseDetector):
     """Deterministic synthetic detector for tests and headless validation."""
 
-    def __init__(self, predefined_detections: Optional[List[Detection]] = None) -> None:
+    def __init__(self, predefined_detections: list[Detection] | None = None) -> None:
         """Initialize mock detector.
 
         Args:
@@ -205,7 +206,7 @@ class MockDetector(BaseDetector):
         """
         self.predefined_detections = predefined_detections
 
-    def detect(self, frame: Any) -> List[Detection]:
+    def detect(self, frame: Any) -> list[Detection]:
         """Return predefined or synthetic detections."""
         if frame is None or not isinstance(frame, np.ndarray):
             raise ValueError("Frame must be a valid numpy.ndarray.")

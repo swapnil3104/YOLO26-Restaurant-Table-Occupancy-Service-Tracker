@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+
 import cv2
 import numpy as np
 import pytest
@@ -9,7 +10,6 @@ import pytest
 from smartserve.vision.capture import (
     CameraStatus,
     FramePacket,
-    InvalidFrameError,
     VideoCapturePipeline,
     VideoSourceNotFoundError,
 )

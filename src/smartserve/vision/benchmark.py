@@ -107,7 +107,11 @@ def benchmark_detector(
         height, width = frame_shape
         frame = np.full((height, width, 3), 128, dtype=np.uint8)
         # Add high-contrast feature
-        frame[int(height * 0.2): int(height * 0.8), int(width * 0.3): int(width * 0.7)] = [200, 50, 50]
+        frame[int(height * 0.2) : int(height * 0.8), int(width * 0.3) : int(width * 0.7)] = [
+            200,
+            50,
+            50,
+        ]
     else:
         frame = test_frame
         height, width = frame.shape[:2]

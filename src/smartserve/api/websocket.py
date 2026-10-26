@@ -40,3 +40,8 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
+
+
+async def broadcast_event(event_type: str, data: dict) -> None:
+    """Helper to broadcast typed event message across connected clients."""
+    await manager.broadcast({"type": event_type, "data": data})

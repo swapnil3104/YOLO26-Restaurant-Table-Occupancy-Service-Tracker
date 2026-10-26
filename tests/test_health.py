@@ -31,4 +31,3 @@ def test_health_endpoint():
     assert "secret" not in content_str
     assert "password" not in content_str
     assert "key" not in content_str or "secret_key" not in content_str
-

@@ -58,7 +58,9 @@ def normalize_coordinates(
     )
 
 
-def denormalize_box(bbox: BoundingBox, frame_width: int, frame_height: int) -> tuple[int, int, int, int]:
+def denormalize_box(
+    bbox: BoundingBox, frame_width: int, frame_height: int
+) -> tuple[int, int, int, int]:
     """Convert normalized BoundingBox to absolute pixel integers (x1, y1, x2, y2)."""
     if not bbox.is_normalized:
         return (int(bbox.x1), int(bbox.y1), int(bbox.x2), int(bbox.y2))
@@ -76,10 +78,11 @@ class YOLO26Detector(BaseDetector):
 
     def __init__(
         self,
-        model_path: str = "yolo11n.pt",
-        confidence_threshold: float = 0.45,
+        model_path: str = "yolo26s.pt",
+        confidence_threshold: float = 0.35,
         target_classes: Sequence[str | int] | None = None,
         device: str | None = None,
+        imgsz: int = 640,
     ) -> None:
         """Initialize YOLO26Detector.
 
@@ -88,25 +91,43 @@ class YOLO26Detector(BaseDetector):
             confidence_threshold: Minimum detection confidence score (0.0 to 1.0).
             target_classes: Classes to detect. Defaults to ['person'].
             device: Compute device ('cpu', 'cuda:0', 'mps', or None for auto).
+            imgsz: Input resolution for inference (default: 640, supports 960, 1280 for distant diners).
         """
         self.model_path = model_path
         self.confidence_threshold = float(confidence_threshold)
         self.target_classes = list(target_classes) if target_classes else ["person"]
         self.device = device
+        self.imgsz = int(imgsz)
         self._model: Any | None = None
 
     def _ensure_loaded(self) -> Any:
         """Lazy load the underlying model."""
         if self._model is None:
             try:
+                from pathlib import Path
+
                 from ultralytics import YOLO
 
+                # Resolve model path if not directly found
+                resolved_path = Path(self.model_path)
+                if not resolved_path.exists():
+                    # Check relative to project root or common locations
+                    project_root = Path(__file__).resolve().parent.parent.parent.parent
+                    cand = project_root / self.model_path
+                    if cand.exists():
+                        resolved_path = cand
+                    else:
+                        cand_models = project_root / "models" / self.model_path
+                        if cand_models.exists():
+                            resolved_path = cand_models
+
                 logger.info(
-                    "Loading YOLO model '%s' on device %s...",
-                    self.model_path,
+                    "Loading YOLO model '%s' on device %s (imgsz=%d)...",
+                    str(resolved_path),
                     self.device or "auto",
+                    self.imgsz,
                 )
-                self._model = YOLO(self.model_path)
+                self._model = YOLO(str(resolved_path))
             except Exception as exc:
                 logger.error("Failed to load YOLO model from %s: %s", self.model_path, exc)
                 raise RuntimeError(
@@ -142,6 +163,7 @@ class YOLO26Detector(BaseDetector):
             source=frame,
             conf=self.confidence_threshold,
             device=self.device,
+            imgsz=self.imgsz,
             verbose=False,
         )
 
@@ -164,7 +186,11 @@ class YOLO26Detector(BaseDetector):
             class_name = names_dict.get(cls_id, str(cls_id))
 
             # Filter for target classes if specified
-            if self.target_classes and class_name not in self.target_classes and cls_id not in self.target_classes:
+            if (
+                self.target_classes
+                and class_name not in self.target_classes
+                and cls_id not in self.target_classes
+            ):
                 continue
 
             xyxy = box.xyxy[0].cpu().numpy()

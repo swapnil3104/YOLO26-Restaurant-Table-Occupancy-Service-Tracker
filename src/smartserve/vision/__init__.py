@@ -27,6 +27,8 @@ from smartserve.vision.tracker import (
 )
 from smartserve.vision.visualizer import (
     draw_detection_overlay,
+    draw_spatial_association_overlay,
+    draw_table_zones_overlay,
     draw_tracking_overlay,
     get_track_color,
 )
@@ -55,6 +57,8 @@ __all__ = [
     "calculate_iou",
     "denormalize_box",
     "draw_detection_overlay",
+    "draw_spatial_association_overlay",
+    "draw_table_zones_overlay",
     "draw_tracking_overlay",
     "get_track_color",
     "normalize_coordinates",

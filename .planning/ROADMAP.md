@@ -7,20 +7,20 @@
 
 
 ## Milestone 1: Occupancy MVP (Phases 3-4)
-- [ ] **Phase 3: Table Layout and Association** - Normalized polygon table coordinates, point-in-polygon association, and ambiguous track handling.
-- [ ] **Phase 4: Occupancy State Machine and Sessions** - Temporal occupancy persistence, vacancy grace periods, session management, and guest counting.
+- [x] **Phase 3: Table Layout and Association** - Normalized polygon table coordinates, point-in-polygon association, and ambiguous track handling.
+- [x] **Phase 4: Occupancy State Machine and Sessions** - Temporal occupancy persistence, vacancy grace periods, session management, and guest counting.
 
 ## Milestone 2: Service Timing (Phases 5-7)
-- [ ] **Phase 5: Database and Event Domain** - SQLAlchemy models, Alembic migrations, event schemas with verification status, and audit logs.
-- [ ] **Phase 6: Service Timers and Rules Engine** - Response time calculations, food delivery timers, configurable alert thresholds, and deduplication.
-- [ ] **Phase 7: Attendance and Food-Delivery Confirmation** - Waiter and manager confirmation endpoints, actor tracking, and POS/KDS adapter hooks.
+- [x] **Phase 5: Database and Event Domain** - SQLAlchemy models, Alembic migrations, event schemas with verification status, and audit logs.
+- [x] **Phase 6: Service Timers and Rules Engine** - Response time calculations, food delivery timers, configurable alert thresholds, and deduplication.
+- [x] **Phase 7: Attendance and Food-Delivery Confirmation** - Waiter and manager confirmation endpoints, actor tracking, and POS/KDS adapter hooks.
 
 ## Milestone 3: Dashboard MVP (Phases 8-9)
-- [ ] **Phase 8: FastAPI and Security** - REST endpoints, OpenAPI docs, authentication, role-based authorization, and CORS.
-- [ ] **Phase 9: React Dashboard** - Interactive floor grid, KPI cards, table timeline, alert handling, and live WebSocket synchronization.
+- [x] **Phase 8: FastAPI and Security** - REST endpoints, OpenAPI docs, authentication, role-based authorization, and CORS.
+- [x] **Phase 9: React Dashboard** - Interactive floor grid, KPI cards, table timeline, alert handling, and live WebSocket synchronization.
 
 ## Milestone 4: Analytics MVP (Phase 10)
-- [ ] **Phase 10: Analytics and Reports** - Aggregated KPIs, median response times, turnover rates, section filters, and CSV export.
+- [x] **Phase 10: Analytics and Reports** - Aggregated KPIs, median response times, turnover rates, section filters, and CSV export.
 
 ## Milestone 5: Pilot Ready (Phase 11)
 - [ ] **Phase 11: Reliability, Privacy, and Pilot** - Reconnection resilience, privacy verification, benchmark evaluation on test clips, and pilot review.
@@ -64,72 +64,72 @@
 **Depends on:** Phase 2
 **Requirements:** FR-03
 **Success Criteria:**
-- [ ] Configuration survives application restart.
-- [ ] A track inside a configured region is associated according to documented rules.
-- [ ] Ambiguous tracks are returned as unassigned rather than forced into a table.
+- [x] Configuration survives application restart.
+- [x] A track inside a configured region is associated according to documented rules.
+- [x] Ambiguous tracks are returned as unassigned rather than forced into a table.
 
 ### Phase 4: Occupancy State Machine and Sessions
 **Goal:** Build deterministic occupancy state machine, persistence windows, vacancy grace periods, and session lifecycles.
 **Depends on:** Phase 3
 **Requirements:** FR-04, FR-05
 **Success Criteria:**
-- [ ] State transitions follow the documented state machine.
-- [ ] Brief occlusion does not automatically end an active session.
-- [ ] A completed session has valid start/end timestamps.
-- [ ] A camera outage does not automatically mark tables vacant.
+- [x] State transitions follow the documented state machine.
+- [x] Brief occlusion does not automatically end an active session.
+- [x] A completed session has valid start/end timestamps.
+- [x] A camera outage does not automatically mark tables vacant.
 
 ### Phase 5: Database and Event Domain
 **Goal:** Design relational schemas, SQLAlchemy models, Alembic migrations, transaction-safe updates, and audit logging.
 **Depends on:** Phase 4
 **Requirements:** FR-07
 **Success Criteria:**
-- [ ] Migrations create the schema from an empty database.
-- [ ] Duplicate submissions do not create duplicate operational events.
-- [ ] Corrections preserve an audit trail.
+- [x] Migrations create the schema from an empty database.
+- [x] Duplicate submissions do not create duplicate operational events.
+- [x] Corrections preserve an audit trail.
 
 ### Phase 6: Service Timers and Rules Engine
 **Goal:** Compute first attendance, food delivery, and occupancy duration with configurable threshold alerts.
 **Depends on:** Phase 5
 **Requirements:** FR-06, FR-08
 **Success Criteria:**
-- [ ] Calculations use timestamps and return no fabricated value when an event is missing.
-- [ ] Alert rules produce one active alert per deduplication key/condition.
-- [ ] Unit tests cover threshold boundaries.
+- [x] Calculations use timestamps and return no fabricated value when an event is missing.
+- [x] Alert rules produce one active alert per deduplication key/condition.
+- [x] Unit tests cover threshold boundaries.
 
 ### Phase 7: Attendance and Food-Delivery Confirmation
 **Goal:** Provide waiter and manager confirmation endpoints with source and verification attribution.
 **Depends on:** Phase 6
 **Requirements:** FR-07
 **Success Criteria:**
-- [ ] Authorized users can confirm attendance and delivery.
-- [ ] Repeated submissions are handled idempotently.
-- [ ] Event source and verification status appear in the timeline.
+- [x] Authorized users can confirm attendance and delivery.
+- [x] Repeated submissions are handled idempotently.
+- [x] Event source and verification status appear in the timeline.
 
 ### Phase 8: FastAPI and Security
 **Goal:** Implement full REST API endpoints, OpenAPI documentation, authentication, and role-based access control.
 **Depends on:** Phase 7
 **Requirements:** FR-09
 **Success Criteria:**
-- [ ] API routes return documented response schemas.
-- [ ] Role checks are enforced server-side.
-- [ ] Health endpoint reports status without leaking secrets.
+- [x] API routes return documented response schemas.
+- [x] Role checks are enforced server-side.
+- [x] Health endpoint reports status without leaking secrets.
 
 ### Phase 9: React Dashboard
 **Goal:** Build responsive real-time operations dashboard with interactive floor grid, alert tray, and WebSocket updates.
 **Depends on:** Phase 8
 **Requirements:** FR-10
 **Success Criteria:**
-- [ ] A manager can identify overdue tables and open details.
-- [ ] Live changes appear without manual page refresh.
-- [ ] Disconnection and stale state are clearly visible.
+- [x] A manager can identify overdue tables and open details.
+- [x] Live changes appear without manual page refresh.
+- [x] Disconnection and stale state are clearly visible.
 
 ### Phase 10: Analytics and Reports
 **Goal:** Provide aggregated metrics, median response times, turnover rates, and authorized CSV exports.
 **Depends on:** Phase 9
 **Requirements:** FR-06, FR-09
 **Success Criteria:**
-- [ ] Dashboard and exported report values match for the same filters.
-- [ ] Employee-level data is restricted to authorized roles.
+- [x] Dashboard and exported report values match for the same filters.
+- [x] Employee-level data is restricted to authorized roles.
 
 ### Phase 11: Reliability, Privacy, and Pilot
 **Goal:** Implement camera reconnect resilience, privacy controls, performance profiling, and pilot verification.

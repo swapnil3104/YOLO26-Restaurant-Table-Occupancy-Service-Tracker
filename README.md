@@ -1,3 +1,10 @@
+# ⚠️ UNDER ACTIVE DEVELOPMENT — PLEASE DO NOT CLONE ⚠️
+
+> ### 🚧 **Notice:** This project is currently under active development. **Please do not clone or use this repository yet.**
+> ### Once development is finished, it will be open to everyone! Thank you for your patience.
+
+---
+
 # 🍽️ SmartServe AI — Restaurant Table Occupancy & Service Tracker
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -12,8 +19,11 @@ An intelligent, computer-vision platform for dining operations. SmartServe AI tr
 
 ## 🏗️ Architecture & Core Principles
 
+- **Fine-Tuned YOLO26 Weights:** Object detection is powered strictly by the project's fine-tuned YOLO26 checkpoint (`models/yolo26_restaurant_cctv.pt`), evaluated on indoor dining CCTV footage with persistent ByteTrack object tracking.
+- **Two Segregated Surveillance & Vision Views:**
+  1. **Standard CCTV:** Multi-feed physical security viewing only. Raw video rendering strictly decoupled from AI inference (zero inference jobs or analytics events).
+  2. **Tracking View:** Multi-floor camera management with automatic fine-tuned YOLO26 inference, table occupancy tracking, and dynamic Central + Floor-Level KPIs.
 - **Separation of Observations vs. Business Facts:** Computer vision detections are treated as transient candidates, while operational events (table occupancy, waiter greeting, food served) require temporal verification or authorized staff confirmation.
-- **Provider-Agnostic Vision Pipeline:** Decoupled `BaseDetector` and `BaseTracker` interfaces allow seamless switching between Ultralytics YOLO models (YOLO11, YOLOv8) and trackers (ByteTrack, BoT-SORT) without rewriting core logic.
 - **Privacy-by-Design:** Raw video is processed in memory and discarded by default. No continuous video or unauthorized biometric data is retained.
 
 ---

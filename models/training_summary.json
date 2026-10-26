@@ -1,0 +1,16 @@
+{
+  "base_model": "yolo26s.pt",
+  "fine_tuned_model": "yolo26_restaurant_cctv.pt",
+  "target_weights_path": "E:\\YOLO26-Restaurant-Table-Occupancy-Service-Tracker\\models\\yolo26_restaurant_cctv.pt",
+  "dataset_yaml": "E:\\YOLO26-Restaurant-Table-Occupancy-Service-Tracker\\datasets\\restaurant_cctv_clean\\data.yaml",
+  "epochs": 15,
+  "imgsz": 640,
+  "training_time_seconds": 224.9,
+  "metrics": {
+    "mAP50": 0.9933,
+    "mAP50_95": 0.775,
+    "precision": 0.9551,
+    "recall": 0.9665
+  },
+  "saved_at": "2026-10-26 09:44:01 UTC"
+}

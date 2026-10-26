@@ -11,6 +11,7 @@ from collections.abc import Generator
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import Any
 
 import cv2
 import numpy as np
@@ -69,6 +70,11 @@ class FramePacket:
     def aspect_ratio(self) -> float:
         """Calculate width-to-height aspect ratio."""
         return self.width / max(self.height, 1)
+
+    @property
+    def timestamp(self) -> float:
+        """UTC epoch timestamp in seconds."""
+        return self.timestamp_utc.timestamp()
 
 
 class VideoCapturePipeline:
@@ -261,3 +267,14 @@ class VideoCapturePipeline:
         if self._status != CameraStatus.COMPLETED:
             self._status = CameraStatus.DISCONNECTED
         logger.info("Camera %s resources released.", self.camera_id)
+
+    def close(self) -> None:
+        """Alias for release."""
+        self.release()
+
+    def __enter__(self) -> "VideoCapturePipeline":
+        self.open()
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.release()

@@ -352,3 +352,24 @@ Use structured logs with correlation IDs. Do not log raw video, credentials, or 
 - Failure behavior for camera loss and uncertain events is specified.
 - Privacy, security, and retention assumptions are documented.
 - Model and tracker dependencies are verified before implementation is pinned.
+
+---
+
+## 16. Surveillance & Vision Architecture (Refactor)
+
+### 16.1 View Segregation & Zero-Inference Policy
+The Surveillance & Vision subsystem exposes two dedicated, primary views:
+1. **Standard CCTV (`StandardCctvView`):** Multi-camera, view-only facility security. Streams raw CCTV video without triggering computer vision models, tracker states, occupancy machines, or analytics events.
+2. **Tracking View (`TrackingView`):** Operational computer vision monitoring. Feeds are registered incrementally across restaurant floors and automatically linked to the fine-tuned YOLO26 model (`models/yolo26_restaurant_cctv.pt`) and ByteTrack.
+
+### 16.2 Fine-Tuned YOLO26 Model & Inference Pipeline
+- Model checkpoint: `models/yolo26_restaurant_cctv.pt` (fine-tuned on dining CCTV dataset; mAP50 = 0.7416).
+- Inference worker manager (`TrackingWorkerManager`): Idempotent worker lifecycle with state persistence in `tracking_jobs` and `cameras`.
+- Automatic resource cleanup: Camera deletion halts active tracking workers, terminates OpenCV handles, and preserves historical analytics data.
+
+### 16.3 Dynamic Floor and Central Analytics Aggregation
+- **Floor-Level KPIs:** Calculated per restaurant floor (monitored tables, occupancy rate, seated patrons, service timers, alerts) dynamically created upon adding a floor's camera.
+- **Central Restaurant KPIs:** Aggregated strictly from raw numerators and denominators across active floors (never direct sums of averages or percentages).
+- **Deduplication:** Canonical table mappings prevent double counting across overlapping camera angles.
+- **Scope Segregation:** Explicitly distinguishes `LIVE_ACTIVE_SOURCES`, `HISTORICAL_SHIFT`, and `COMBINED`.
+

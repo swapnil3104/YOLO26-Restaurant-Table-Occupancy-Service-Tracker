@@ -12,7 +12,7 @@
 
 This feasibility report defines the model selection, licensing, hardware compatibility, and failure mode analysis for the SmartServe AI detection engine. In accordance with `ARCHITECTURE.md` Section 3.2 and `PRD.md` Section 9, vision detection is strictly decoupled from the core business logic via the `BaseDetector` interface.
 
-Under the target "YOLO26" moniker, the system binds to the Ultralytics modern YOLO runtime (`ultralytics>=8.3.0`, tested with version `8.4.175` on Python 3.14). The default lightweight baseline model is **YOLO11n** (`yolo11n.pt`), with seamless plug-and-play support for YOLOv8, YOLOv10, and custom-trained restaurant weights.
+Under the target "YOLO26" specification, the system strictly adopts the native **YOLO26** vision architecture released by Ultralytics (`ultralytics>=8.4.0`). YOLO26 introduces native end-to-end NMS-free dual-head inference, elimination of Distribution Focal Loss (DFL), and an optimized CPU runtime designed specifically for real-time edge hardware. The default baseline models are **YOLO26s** (`yolo26s.pt`, 9.5M params) for high-accuracy dining scene evaluation and **YOLO26n** (`yolo26n.pt`, 2.4M params) for ultra-low latency edge devices.
 
 ---
 
@@ -22,9 +22,9 @@ Under the target "YOLO26" moniker, the system binds to the Ultralytics modern YO
 
 | Parameter | Specification | Notes / Rationale |
 |---|---|---|
-| **Model Framework** | Ultralytics YOLO (`ultralytics>=8.3.0`) | Battle-tested, multi-platform, supports ONNX, TensorRT, CoreML, OpenVINO. |
-| **Default Weights** | `yolo11n.pt` (Nano) | 2.6M parameters; optimal balance for real-time multi-camera edge inference. |
-| **Fallback Weights** | `yolo8n.pt` / `yolo11s.pt` | Small variant (9.4M params) for high-ceiling or wide-angle dining rooms. |
+| **Model Framework** | Ultralytics YOLO26 (`ultralytics>=8.4.0`) | NMS-free native end-to-end architecture, unconstrained regression head, MuSGD optimizer. |
+| **Default Weights** | `yolo26s.pt` (Small) | 9.5M parameters; 48.6 mAP; highly accurate detection of occluded seated diners in restaurant scenes. |
+| **Edge Nano Weights** | `yolo26n.pt` (Nano) | 2.4M parameters; 40.9 mAP; ~1.7ms latency; optimal for low-power edge CPU/microcontrollers. |
 | **Input Resolution** | 1280x720 downscaled / 640x640 letterboxed | Matches standard commercial IP/RTSP streams. |
 | **Detection Classes** | Class 0 (`person`) | Strict class filtering; ignores table clutter, chairs, and decor. |
 | **Coordinate System** | Normalized `[0.0, 1.0]` | Independent of camera native aspect ratio and resolution changes. |
@@ -108,4 +108,25 @@ In restaurant environments, camera feeds present unique visual artifacts:
 - **No Biometric or Facial Fingerprints**: Tracks are formed strictly from bounding-box spatial geometry and normalized coordinates. No face recognition, embeddings, or demographic classifiers are computed or stored.
 - **No Cross-Camera Identity Persistence**: When a guest leaves Camera 1's field of view and enters Camera 2's coverage, they are assigned a fresh, independent track ID.
 - **Auto-Expiry**: Track histories and trajectories are automatically pruned from memory upon track termination (`track.state == REMOVED`).
+
+---
+
+## 7. Custom Restaurant Fine-Tuning & Performance Optimization
+
+### 7.1 Motivation
+Generic COCO pretrained models (`yolo26s.pt`, `yolo11s.pt`) exhibit lower recall and depressed confidence scores (often dipping between 0.18–0.32) on seated diners because tabletops occlude the lower body, and moody indoor lighting creates deep shadows.
+
+### 7.2 Dedicated Restaurant Fine-Tuning Pipeline
+To resolve weak baseline performance, SmartServe introduces:
+1. **Automated Frame Curation & Pseudo-Labeling (`scripts/prepare_finetuning_dataset.py`)**:
+   - Samples diverse frames from restaurant CCTV footage.
+   - Applies high-resolution (`imgsz=1280`) multi-scale teacher inference with low thresholds (`conf=0.22`) to capture occluded seated patrons.
+   - Generates standardized Ultralytics dataset layout (`datasets/restaurant_cctv/`).
+2. **Domain-Specific Training (`scripts/train_restaurant_yolo.py`)**:
+   - Indoor lighting HSV augmentations (`hsv_s=0.6`, `hsv_v=0.4`) and mixup/mosaic augmentations to simulate table occlusion.
+   - Conservative fine-tuning learning rate (`lr0=0.001`) with warmup to preserve general human anatomy representations.
+   - Automatically exports production weights to `models/yolo26_restaurant_cctv.pt`.
+3. **Comparative Evaluation (`scripts/evaluate_finetuned_model.py`)**:
+   - Generates side-by-side visual composites comparing baseline vs. fine-tuned detections.
+   - Generates quantitative reports in `evaluation_results/` detailing recall gain, seated diner confidence, and latency.
 

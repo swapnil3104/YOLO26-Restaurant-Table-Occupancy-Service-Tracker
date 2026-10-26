@@ -1,0 +1,9 @@
+{
+  "first_attendance_warning_sec": 180.0,
+  "first_attendance_critical_sec": 300.0,
+  "food_delivery_warning_sec": 900.0,
+  "food_delivery_critical_sec": 1500.0,
+  "no_interaction_warning_sec": 600.0,
+  "occupancy_warning_sec": 7200.0,
+  "camera_stale_critical_sec": 30.0
+}

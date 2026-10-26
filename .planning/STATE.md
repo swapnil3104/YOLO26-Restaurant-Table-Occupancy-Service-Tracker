@@ -1,9 +1,151 @@
 # Project State
 
 ## Current Position
-- **Active Phase:** Phase 2 (Tracking Adapter)
+- **Active Phase:** Phase 10 (Analytics and Reports)
 - **Status:** Complete
-- **Next Phase:** Phase 3 (Table Layout and Association)
+- **Next Phase:** Phase 11 (Reliability, Privacy, and Pilot)
+
+## Phase 10 Completion Notes
+- Implemented comprehensive KPI calculations conforming strictly to `Docs/PRD.md` Section 10.3, 10.4, 12, 13 and `Docs/RULES.md` Section 8, 14:
+  - Exact interval metrics: First response time ($T_{response} = T_{attendance} - T_{seating}$), food delivery time ($T_{food} = T_{delivery} - T_{seating}$), and occupancy duration ($T_{occupancy} = T_{end} - T_{seating}$).
+  - Computed both arithmetic means and medians for outlier-resilient service evaluation (`median_response_time_sec`, `median_food_delivery_time_sec`, `median_occupancy_duration_sec`).
+  - Table utilization % ($T_{occupied} / T_{window}$) and table turnover rate (turns / table).
+  - Delay rate % ($\text{delayed sessions} / \text{eligible sessions} \times 100$) and service data completeness % ($\text{fully instrumented sessions} / N_{total} \times 100$).
+  - Full sample size transparency: Discloses $N_{total}$, $N_{attended}$, $N_{food}$, $N_{completed}$, and $N_{invalid}$ without silent clamping or zero-filling for unrecorded events.
+- Advanced Multi-Dimensional Filtering & Aggregations:
+  - Supports filtering by section (`Patio`, `Main Dining`, `Bar`), table ID, waiter ID, custom date ranges (`start_date`, `end_date`), and confirmation status (`include_estimates=true|false`).
+  - Implemented `GET /api/v1/analytics/breakdown` providing grouped performance matrices across tables (turnover, utilization, alerts), waiters (attended sessions, average response times), and 24-hour hourly distribution of dining traffic.
+- Role-Based Privacy & Employee Masking (`Docs/PRD.md` Section 13):
+  - Employee-level analytics and breakdown routes strictly restrict identity disclosure to `MANAGER` and `ADMIN` roles.
+  - Automatically masks waiter identifiers as `STAFF-****` for unprivileged callers (`WAITER` role).
+- Multi-Format Authorized CSV Export:
+  - Extended `GET /api/v1/analytics/export` supporting `report_type=sessions|summary|waiters` with filename content disposition and streaming CSV responses.
+  - Strict parity guarantee: Exported CSV calculations and values match dashboard JSON metrics identically for the same filters.
+- Interactive Dark Analytics Dashboard (`/analytics`):
+  - Built `frontend/src/pages/AnalyticsReportsPage.tsx` with responsive layout, top KPI cards with mean/median toggle and target threshold badges (e.g. `<= 3m target`), sample size audit disclosure ribbon, interactive filters (preset time buttons, section, table, staff), tabbed breakdown views (Table matrix, Staff efficiency, 24h dining traffic bar chart), and export modal.
+  - Linked to shared sidebar navigation with Lucide `BarChart3` icon and wired into `App.tsx` routing.
+- Comprehensive Automated Test Suite:
+  - Added 5 comprehensive test suites in `tests/test_analytics_and_reports.py` testing mathematical calculations, filtering, breakdowns, privacy masking, and CSV parity.
+  - All 95 backend tests pass cleanly (`pytest -v` in 5.27s).
+  - Verified frontend build with TypeScript and Vite (`npm run build` succeeds with 0 errors in 2.29s).
+- Implemented three-page modern dark operations console specified in `Docs/DESIGN.md`:
+  - Shared Shell: `Header` with brand, location & shift picker, connection state pill (`Live Sync` / `Connecting` / `Offline`), data freshness relative counter, and staff account switcher (Waiter, Manager, Admin) for testing RBAC; `Sidebar` with alert badges and responsive collapse.
+  - Page 1 (`LiveCameraPage` / `/live-camera`): Raw CCTV surveillance video feeds without computer vision overlays, multi-feed layouts (single, split, quad), camera selector tabs, connection state badges, and timestamp overlays.
+  - Page 2 (`CameraTrackPage` / `/camera-track`): Processed computer vision video stream annotated with YOLO person bounding boxes, ByteTrack IDs, and table polygon zones; overlay toggle controls; side CV summary panel with estimated patron count, table association states, recent tracking events, model inference HUD (latency 14.8ms, 28.5 FPS), and technical privacy notice.
+  - Page 3 (`DashboardPage` / `/dashboard`): Operational overview with 6 top KPI cards, interactive table grid with status color coding, estimated guest counts, session duration timers, active alert indicators, section/status/search filters, alert queue with in-place acknowledge and resolve actions, table detail drawer with chronological service timeline and verification badges ("Confirmed by Waiter", "AI Vision Estimate", "Manager Override"), operational confirmation actions (attendance, food delivery by course and batch, table cleaning reset), and KPI summary modal with CSV export.
+- Backend Camera Streaming & CV Metadata Service in `src/smartserve/api/routes/cameras.py`:
+  - `GET /api/v1/cameras`: Returns metadata and stream URLs for 4 registered restaurant cameras.
+  - `GET /api/v1/cameras/{id}`: Single camera details and health.
+  - `GET /api/v1/cameras/{id}/stream/raw`: MJPEG multipart stream delivering raw CCTV footage.
+  - `GET /api/v1/cameras/{id}/stream/processed`: MJPEG multipart stream annotated with YOLO detection and tracking overlays.
+  - `GET /api/v1/cameras/{id}/snapshot`: Single JPEG frame snapshot.
+  - `GET /api/v1/cameras/{id}/cv-metadata`: Latest frame CV detection and tracking telemetry.
+  - Mounted `cameras_router` under `/api/v1` in `src/smartserve/main.py`.
+- Real-time synchronization & WebSocket broadcast:
+  - Enhanced WebSocket connection manager in `src/smartserve/api/websocket.py` with `broadcast_event()` helper.
+  - Wired initial connected greeting and heartbeat ping/pong in `/ws/events`.
+  - Implemented `useRealtime` hook with automated reconnection and data refresh.
+- Verified test suite and frontend build:
+  - Added 4 automated unit and integration tests in `tests/test_camera_stream_api.py` (all 90 project tests passing cleanly in ~5.3s).
+  - Verified frontend build with TypeScript and Vite (`npm run build` succeeds with 0 errors in 2.33s).
+
+## Phase 8 Completion Notes
+- Implemented JWT token generation and authentication lifecycle in `src/smartserve/security/auth.py` and `src/smartserve/api/routes/auth.py`:
+  - `POST /api/v1/auth/login` issuing signed JWT tokens with 24-hour expiration, salted PBKDF2 hash verification, and rate limiting.
+  - `GET /api/v1/auth/me` introspecting authenticated staff profile.
+  - `GET /api/v1/auth/users` listing staff registry, strictly restricted to Manager and Administrator.
+- Enforced server-side Role-Based Access Control (RBAC):
+  - Mutating operations on table layout (`/tables`), manager state overrides (`/occupancy/{id}/override`), service thresholds (`/rules/thresholds`), event rejections (`/events/{id}/reject`), and analytics exports (`/analytics/export`) strictly enforce Manager/Admin roles.
+  - Operational staff endpoints allow `WAITER`, `MANAGER`, `ADMIN`.
+  - Rejection with standardized HTTP 401 Unauthorized for unauthenticated callers and HTTP 403 Forbidden for insufficient permissions or inactive staff.
+- Standardized error handling architecture in `src/smartserve/api/errors.py`:
+  - `ErrorResponse` and `ErrorDetail` schemas standardizing JSON errors with `error_code`, `message`, `timestamp`, and backward-compatible `detail`.
+  - Global FastAPI exception handlers for `HTTPException`, `RequestValidationError`, and unexpected exceptions with complete stack trace sanitization.
+- Upgraded health check probe in `src/smartserve/api/routes/health.py`:
+  - Executes live `SELECT 1` ping on active database engine, measuring query latency in ms.
+  - Probes table configuration storage and vision pipeline status.
+  - Implements strict secrets protection via `src/smartserve/security/secrets.py`, stripping connection strings, passwords, and tokens.
+- Built analytics KPI and CSV export domain service in `src/smartserve/analytics/`:
+  - `GET /api/v1/analytics/summary`: Aggregate KPIs across sessions (median response time, median food delivery time, average occupancy, turnover rate, alert stats).
+  - `GET /api/v1/analytics/export`: Downloadable CSV export with date range filtering and privacy anonymization masking employee IDs (`STAFF-****`) in accordance with PRD Section 13.
+- Implemented in-memory sliding window rate limiting in `src/smartserve/security/rate_limiter.py` protecting sensitive endpoints and returning HTTP 429 with `Retry-After`.
+- Configured OpenAPI 3.1 documentation in `src/smartserve/main.py` with `BearerAuth` and `ApiKeyAuth` security schemes and comprehensive category tags.
+- Developed chronological demonstration utility `scripts/demo_security_and_api.py` verifying health probes, authentication, RBAC gates, analytics, CSV export with privacy anonymization, and rate limiting.
+- Added 8 automated unit, security, and API tests in `tests/test_fastapi_security.py` (all 86 project tests passing cleanly in ~5s).
+- Implemented security and actor authorization framework in `src/smartserve/security/auth.py`:
+  - `get_current_actor` & `resolve_actor` verifying active staff identity across headers (`X-User-ID`), Bearer tokens, query parameters, and body payloads against the database user registry.
+  - Role enforcement: `require_staff_actor` (WAITER, MANAGER, ADMIN) and `require_manager_or_admin`.
+  - Rejection with HTTP 401 Unauthorized for unknown/missing users and HTTP 403 Forbidden for inactive users or insufficient roles.
+- Enhanced `EventDomainService` in `src/smartserve/events/service.py`:
+  - `confirm_attendance`: Enforces active table session association (rejects vacant tables with HTTP 400 Bad Request), records confirmed attendance with actor attribution, sets `first_attendance_at` milestone, auto-resolves overdue attendance alerts, and guarantees idempotency.
+  - `confirm_food_delivery`: Enforces active table session, supports multiple delivery batches (batch 1 appetizers, batch 2 mains, desserts), sets and preserves earliest `first_food_delivery_at` milestone across subsequent batches, auto-resolves overdue delivery alerts, and attaches course and item metadata.
+  - `reject_event`: Managerial rejection of mistaken events with audit justification (`AuditLog`), automatically recalculating dependent session milestones and alert states via `RulesEngine.recalculate_session`.
+  - `get_session_timeline`: Aggregates chronological events for a session with actor display names, active milestone flags, and presentation badges.
+- Implemented presentation layer and UI copy in `src/smartserve/events/timeline.py`:
+  - `build_timeline_item_ui_badge` and `format_timeline_item` providing unambiguous badge copy distinguishing verified human confirmations from automated or candidate AI estimations (e.g., "Confirmed by Waiter (Sam Waiter)" vs. "AI Vision Estimate (Candidate 72% - Unconfirmed)").
+- Defined POS and KDS integration adapter interfaces in `src/smartserve/integrations/`:
+  - `BasePOSAdapter` and `BaseKDSAdapter` abstract contracts.
+  - `MockPOSAdapter` and `MockKDSAdapter` reference implementations with automated table code translation (`T-01` -> `table-01`).
+  - REST webhook endpoints `/api/v1/integrations/pos/order`, `/api/v1/integrations/pos/payment`, and `/api/v1/integrations/kds/bump` mounted in `src/smartserve/main.py`.
+- Developed chronological demonstration utility `scripts/demo_confirmations.py` demonstrating seating -> candidate vision -> alert evaluation -> waiter confirmation -> POS order -> multi-batch food delivery -> manager rejection & safe recalculation -> session timeline.
+- Added 7 automated unit and integration tests in `tests/test_attendance_and_food_confirmation.py` (all 78 project tests passing cleanly in ~3.6s).
+
+## Phase 6 Completion Notes
+- Implemented `SessionTimersCalculator` in `src/smartserve/rules/timers.py`:
+  - Accurate calculation of first-response time ($T_{response} = T_{attendance} - T_{seating}$), food delivery time ($T_{food} = T_{first\_delivery} - T_{seating}$), attendance-to-delivery interval ($T_{attendance \rightarrow food} = T_{first\_delivery} - T_{first\_attendance}$), and occupancy duration ($T_{occupancy} = T_{end} - T_{seating}$).
+  - Missing-event handling returning `None` without fabricated fallback numbers.
+  - Negative interval and anomaly detection without silent clamping to zero, flagging `SessionStatus.NEEDS_REVIEW`.
+  - Timezone-aware UTC timestamp normalization (`ensure_utc`).
+- Implemented `ServiceThresholds` and `ThresholdManager` in `src/smartserve/rules/thresholds.py` supporting configurable warning/critical thresholds with hierarchy validation and atomic disk persistence.
+- Implemented `RulesEngine` in `src/smartserve/rules/engine.py`:
+  - Alert deduplication: strict 1-active-alert per `{session_id}:{alert_type}` deduplication key.
+  - In-place alert escalation: seamlessly upgrades active `WARNING` alerts to `CRITICAL` upon crossing critical thresholds without duplicate alert spam.
+  - Auto-resolution on qualifying events: confirmed attendance and food delivery events automatically resolve active overdue alerts.
+  - Safe recalculation: `recalculate_session` recalculates session milestones from eligible confirmed events (excluding `CORRECTED` and `REJECTED`) and re-evaluates alerts.
+- Wired alert auto-resolution into `EventDomainService.record_event` and recalculation into `EventDomainService.correct_event`.
+- Exposed REST API endpoints under `/api/v1/sessions/{session_id}/timers`, `/api/v1/rules/evaluate`, `/api/v1/rules/thresholds`, and `/api/v1/sessions/{session_id}/recalculate` mounted in `src/smartserve/main.py`.
+- Developed chronological demonstration utility `scripts/demo_rules_engine.py` verifying the full lifecycle progression.
+- Added 8 automated unit, boundary, and REST API tests in `tests/test_service_timers_and_rules.py` (all 71 project tests passing cleanly in ~4.3s).
+
+## Phase 5 Completion Notes
+- Implemented SQLAlchemy 2.0 ORM models in `src/smartserve/database/models.py`: `Restaurant`, `Camera`, `Table`, `User`, `TableSession`, `ServiceEvent`, `WaiterAssignment`, `Alert`, and `AuditLog`.
+- Built `UTCDateTime` TypeDecorator in `src/smartserve/database/base.py` ensuring timezone-aware UTC preservation across SQLite and PostgreSQL engines.
+- Configured Alembic migration framework (`alembic.ini`, `migrations/env.py`, `migrations/script.py.mako`) and generated initial migration (`migrations/versions/e9e9025ec769_initial_schema.py`) creating all 9 tables, indexes, and foreign key cascades from an empty database.
+- Implemented domain schemas in `src/smartserve/events/schema.py` (`EventType`, `EventSource`, `VerificationStatus`, `SessionStatus`, `AlertSeverity`, `AlertStatus`, `UserRole`, `ServiceEventCreate`, `ServiceEventRead`, `EventCorrectionRequest`, `TableSessionCreate`, `TableSessionRead`, `AlertCreate`, `AlertRead`, `AuditLogRead`).
+- Implemented `EventDomainService` in `src/smartserve/events/service.py`:
+  - Idempotency guarantees: unique `idempotency_key` constraint preventing duplicate operational event creation on retries.
+  - Transaction-safe atomic session milestone updates (`first_attendance_at`, `first_food_delivery_at`, `customer_count`, `ended_at`).
+  - Audit-preserving event correction workflow: marks original `CORRECTED`, links new superseding event (`supersedes_event_id`), adjusts parent session metrics, and appends structured diff to `AuditLog`.
+  - Alert management: deduplicates active alerts by `dedup_key`, with staff acknowledgment and resolution actions.
+- Built `DatabaseOccupancySink` in `src/smartserve/occupancy/database_sink.py` bridging the vision state machine with relational database events.
+- Exposed REST API endpoints under `/api/v1/events`, `/api/v1/alerts`, and `/api/v1/audit` mounted into `src/smartserve/main.py`.
+- Developed database management CLI script `scripts/db_manage.py` for seeding (`seed`), inspecting status (`status`), snapshot backup (`backup`), and restore (`restore`).
+- Authored comprehensive disaster recovery guide in `Docs/DATABASE_BACKUP_RESTORE.md`.
+- Added 7 automated unit and integration tests in `tests/test_database_and_events.py` (63 total project tests passing cleanly in ~2.9s).
+- Implemented core enumerations and models in `src/smartserve/occupancy/schema.py`: 7-state `OccupancyState`, `ServiceStatus`, `EventSource`, `VerificationStatus`, `TableSession`, `StateTransitionEvent`, `TableOccupancyStatus`, `ManagerOverrideRequest`, and `CustomerCountUpdateRequest`.
+- Implemented deterministic `TableStateMachine` in `src/smartserve/occupancy/state_machine.py` adhering to `RULES.md` Section 4.1:
+  - Transient passer-by filtering (requires persistent evidence for configurable window before state change).
+  - Persistence confirmation ($5.0$s default) triggers session creation with valid UTC start timestamp and initial guest count.
+  - Vacancy grace period ($180$s default / $15$s demo) tolerates brief occlusion or tracking loss without falsely ending sessions.
+  - Vacancy confirmation calculates exact occupancy duration ($T_{end} - T_{seating}$) with negative duration protection, marks table for cleaning.
+  - Staff cleaning reset returns table to `AVAILABLE`.
+  - Camera outage / stale observation freeze (`camera_healthy=False` or gap > $30$s) preserves table state without false vacancy (Rule 2.5 & 4.3).
+  - Customer count temporal smoothing via sliding median window and within-frame track deduplication (Rule 5.5).
+  - Manager manual override and guest count correction hooks with audit metadata.
+- Implemented `OccupancySessionManager` in `src/smartserve/occupancy/manager.py` providing multi-table orchestration, atomic JSON state persistence (`config/sessions.json`), restart recovery of in-flight sessions, and append-only audit logging (`config/occupancy_audit.jsonl`).
+- Enhanced `src/smartserve/vision/visualizer.py` with `draw_occupancy_state_overlay()` rendering state-tinted zones, centroid state badges with active session duration ($T_{now} - T_{seating}$), guest counts, service status, and restaurant telemetry banners.
+- Built REST API endpoints under `/api/v1/occupancy` for live table status, manager overrides, customer count updates, staff cleaning confirmation, and session/audit history queries.
+- Built chronological demonstration utility `scripts/demo_occupancy_lifecycle.py` verifying full lifecycle progression.
+- Added 14 unit, replay, persistence, and REST API tests in `tests/test_occupancy_state_machine.py` (56 total project tests passing cleanly in ~2.9s).
+- Implemented `Point`, `TablePolygon`, `TableConfig`, `TableLayout`, and `AssociationStatus` in `src/smartserve/tables/schema.py` with normalized coordinate validations $[0.0, 1.0]$, centroid calculations via polygon geometric moments, and shoelace area calculation.
+- Implemented `TableLayoutManager` in `src/smartserve/tables/manager.py` providing CRUD operations and atomic disk persistence (`tables.json`) that survives server restarts.
+- Implemented `SpatialTableAssociator` in `src/smartserve/tables/associator.py` combining ray-casting and OpenCV signed distance (`pointPolygonTest`) against patron bottom-center contact points `(cx, y2)`.
+- Designed robust ambiguity resolution: detects boundary seams between adjacent tables and overlapping table regions; flags competing matches as `AMBIGUOUS` unassigned instead of forcing arbitrary table association.
+- Enforced Rule 5.5 track deduplication and automated table capacity overflow warnings.
+- Enhanced `src/smartserve/vision/visualizer.py` with `draw_table_zones_overlay()` and `draw_spatial_association_overlay()` rendering translucent polygons, badges, patron link lines, and warning trays.
+- Built REST API endpoints under `/api/v1/tables` for layout management and spatial association testing.
+- Created CLI demonstration utility `scripts/demo_table_association.py`.
+- Added 15 automated unit and integration tests in `tests/test_table_association.py` (42 total project tests passing cleanly in ~2.3s).
 
 ## Phase 2 Completion Notes
 - Implemented `SimpleByteTracker`, `YOLO26Tracker`, and `MockTracker` in `src/smartserve/vision/tracker.py` conforming to `BaseTracker`.

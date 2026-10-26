@@ -59,9 +59,28 @@ dmypy.json
 *.avi
 *.mkv
 *.mov
+*.jpg
+*.jpeg
 runs/
 data/raw_videos/
 data/sample_clips/
+demo_*.png
+*.png
+*.part
+datasets/
+
+# Database & Backups
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+backups/
+
+# Runtime state & audit logs
+config/sessions.json
+config/occupancy_audit.jsonl
+*.jsonl
 
 # Node / Frontend
 frontend/node_modules/

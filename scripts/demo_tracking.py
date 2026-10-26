@@ -15,8 +15,8 @@ Usage:
 """
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -97,13 +97,13 @@ def run_video_demo(
     source: str,
     tracker_type: str = "byte",
     engine: str = "bytetrack",
-    model_path: str = "yolo11n.pt",
+    model_path: str = "yolo26s.pt",
     max_frames: int = 100,
     output_path: str | None = None,
 ) -> None:
     """Run detection + tracking on a video source."""
     print(f"Opening video source '{source}' with tracker={tracker_type}...")
-    pipeline = VideoCapturePipeline(source=source, sample_fps=5.0)
+    pipeline = VideoCapturePipeline(source=source, sample_rate_hz=5.0)
 
     if tracker_type == "yolo":
         tracker = YOLO26Tracker(model_path=model_path, tracker_type=engine)
@@ -174,7 +174,7 @@ def main() -> int:
         default="bytetrack",
         help="Tracking engine for YOLO tracker",
     )
-    parser.add_argument("--model", type=str, default="yolo11n.pt", help="YOLO model path")
+    parser.add_argument("--model", type=str, default="yolo26s.pt", help="YOLO26 model path")
     parser.add_argument("--frames", type=int, default=50, help="Maximum frames to process")
     parser.add_argument("--output", type=str, default=None, help="Path to save annotated video")
 

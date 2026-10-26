@@ -8,8 +8,8 @@ Usage:
 
 import argparse
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Ensure src is discoverable when script is executed directly
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
@@ -18,16 +18,19 @@ from smartserve.vision.benchmark import benchmark_detector
 from smartserve.vision.detector import MockDetector, YOLO26Detector
 
 
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="SmartServe Vision Benchmarking Utility")
-    parser.add_argument("--model", type=str, default="yolo11n.pt", help="Path or name of model weights")
+    parser.add_argument(
+        "--model", type=str, default="yolo26s.pt", help="Path or name of YOLO26 model weights"
+    )
     parser.add_argument("--frames", type=int, default=30, help="Number of benchmark frames")
     parser.add_argument("--warmup", type=int, default=5, help="Number of warmup iterations")
     parser.add_argument("--width", type=int, default=1280, help="Input frame width")
     parser.add_argument("--height", type=int, default=720, help="Input frame height")
     parser.add_argument("--device", type=str, default=None, help="Device ('cpu', 'cuda', etc.)")
-    parser.add_argument("--mock", action="store_true", help="Use MockDetector instead of real model")
+    parser.add_argument(
+        "--mock", action="store_true", help="Use MockDetector instead of real model"
+    )
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     return parser.parse_args()
 
@@ -39,7 +42,9 @@ def main() -> int:
         print("Initializing MockDetector for baseline benchmark...")
         detector = MockDetector()
     else:
-        print(f"Initializing YOLO26Detector (model={args.model}, device={args.device or 'auto'})...")
+        print(
+            f"Initializing YOLO26Detector (model={args.model}, device={args.device or 'auto'})..."
+        )
         detector = YOLO26Detector(model_path=args.model, device=args.device)
 
     print(

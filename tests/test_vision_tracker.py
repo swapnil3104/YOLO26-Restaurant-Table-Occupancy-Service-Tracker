@@ -165,7 +165,9 @@ def test_simple_bytetracker_low_confidence_recovery():
     det_weak = Detection("person", 0.30, BoundingBox(0.21, 0.2, 0.36, 0.6))
     t2 = tracker.update([det_weak])
     assert len(t2) == 1
-    assert t2[0].track_id == t_id, "Low confidence detection must be recovered via ByteTrack stage 2"
+    assert t2[0].track_id == t_id, (
+        "Low confidence detection must be recovered via ByteTrack stage 2"
+    )
 
 
 def test_tracker_reset():

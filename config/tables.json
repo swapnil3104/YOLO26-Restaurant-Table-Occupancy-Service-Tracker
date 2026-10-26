@@ -1,0 +1,134 @@
+{
+  "tables": [
+    {
+      "id": "table-01",
+      "code": "T-01",
+      "name": "Round Table Left",
+      "camera_id": "CAM-01",
+      "capacity": 2,
+      "polygon": {
+        "vertices": [
+          {
+            "x": 0.08,
+            "y": 0.18
+          },
+          {
+            "x": 0.33,
+            "y": 0.18
+          },
+          {
+            "x": 0.33,
+            "y": 0.55
+          },
+          {
+            "x": 0.08,
+            "y": 0.55
+          }
+        ]
+      },
+      "section": "Window Section",
+      "is_active": true,
+      "metadata": {
+        "shape": "round",
+        "notes": "Left cafe table with two wooden chairs"
+      }
+    },
+    {
+      "id": "table-02",
+      "code": "T-02",
+      "name": "Round Table Center",
+      "camera_id": "CAM-01",
+      "capacity": 2,
+      "polygon": {
+        "vertices": [
+          {
+            "x": 0.35,
+            "y": 0.12
+          },
+          {
+            "x": 0.58,
+            "y": 0.12
+          },
+          {
+            "x": 0.58,
+            "y": 0.48
+          },
+          {
+            "x": 0.35,
+            "y": 0.48
+          }
+        ]
+      },
+      "section": "Main Dining",
+      "is_active": true,
+      "metadata": {
+        "shape": "round",
+        "notes": "Center cafe table with armchair"
+      }
+    },
+    {
+      "id": "table-03",
+      "code": "T-03",
+      "name": "Vintage Sofa Lounge",
+      "camera_id": "CAM-01",
+      "capacity": 4,
+      "polygon": {
+        "vertices": [
+          {
+            "x": 0.45,
+            "y": 0.3
+          },
+          {
+            "x": 0.98,
+            "y": 0.3
+          },
+          {
+            "x": 0.98,
+            "y": 0.92
+          },
+          {
+            "x": 0.45,
+            "y": 0.92
+          }
+        ]
+      },
+      "section": "Lounge",
+      "is_active": true,
+      "metadata": {
+        "shape": "oval_sofa",
+        "notes": "Large wooden dining table with Chesterfield sofa and armchairs"
+      }
+    },
+    {
+      "id": "t-api-01",
+      "code": "T-API-01",
+      "name": "API Test Table",
+      "camera_id": "CAM-01",
+      "capacity": 4,
+      "polygon": {
+        "vertices": [
+          {
+            "x": 0.1,
+            "y": 0.1
+          },
+          {
+            "x": 0.3,
+            "y": 0.1
+          },
+          {
+            "x": 0.3,
+            "y": 0.3
+          },
+          {
+            "x": 0.1,
+            "y": 0.3
+          }
+        ]
+      },
+      "section": "Main",
+      "is_active": true,
+      "metadata": {}
+    }
+  ],
+  "version": "1.0"
+}

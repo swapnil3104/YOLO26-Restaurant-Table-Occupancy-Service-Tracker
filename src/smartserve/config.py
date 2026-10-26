@@ -1,7 +1,15 @@
-"""Application configuration using Pydantic Settings."""
+from pathlib import Path
 
-
+# pyrefly: ignore[missing-import]
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _resolve_default_model_path() -> str:
+    """Auto-detect fine-tuned restaurant weights if present, otherwise fallback to yolo26s.pt."""
+    finetuned = Path("models/yolo26_restaurant_cctv.pt")
+    if finetuned.exists():
+        return str(finetuned)
+    return "yolo26s.pt"
 
 
 class Settings(BaseSettings):
@@ -41,23 +49,35 @@ class Settings(BaseSettings):
     INFERENCE_FRAME_WIDTH: int = 1280
     INFERENCE_FRAME_HEIGHT: int = 720
 
-    # Model & Tracking
+    # Model & Tracking (Strictly YOLO26)
     DETECTOR_PROVIDER: str = "ultralytics"
-    MODEL_WEIGHTS_PATH: str = "yolo11n.pt"
-    DETECTION_CONFIDENCE_THRESHOLD: float = 0.45
+    MODEL_WEIGHTS_PATH: str = _resolve_default_model_path()
+    INFERENCE_IMGSZ: int = 640
+    DETECTION_CONFIDENCE_THRESHOLD: float = 0.28
     DETECTION_CLASSES: list[str] = ["person"]
     TRACKER_TYPE: str = "bytetrack"
     TRACKER_MAX_AGE_FRAMES: int = 30
+
+    # Table Layout & Association
+    TABLE_LAYOUT_PATH: str = "config/tables.json"
+    TABLE_AMBIGUITY_MARGIN: float = (
+        0.015  # Normalized margin (~10-15px in 720p) for boundary ambiguity
+    )
 
     # Business Rules & Occupancy Timers (seconds)
     OCCUPANCY_PERSISTENCE_TIME_SEC: float = 5.0
     VACANCY_GRACE_SEC: float = 180.0
     TRACKER_OCCLUSION_GRACE_SEC: float = 3.0
+    CAMERA_STALE_THRESHOLD_SEC: float = 30.0
+    CUSTOMER_COUNT_SMOOTHING_WINDOW: int = 5
+    OCCUPANCY_SESSIONS_PATH: str = "config/sessions.json"
+    OCCUPANCY_AUDIT_PATH: str = "config/occupancy_audit.jsonl"
+    REQUIRE_CLEANING_BEFORE_AVAILABLE: bool = True
 
     # Service Alerts Thresholds (seconds)
-    THRESHOLD_FIRST_ATTENDANCE_SEC: float = 300.0       # 5 minutes
-    THRESHOLD_FOOD_DELIVERY_SEC: float = 1200.0         # 20 minutes
-    THRESHOLD_TABLE_OCCUPANCY_MAX_SEC: float = 7200.0   # 2 hours
+    THRESHOLD_FIRST_ATTENDANCE_SEC: float = 300.0  # 5 minutes
+    THRESHOLD_FOOD_DELIVERY_SEC: float = 1200.0  # 20 minutes
+    THRESHOLD_TABLE_OCCUPANCY_MAX_SEC: float = 7200.0  # 2 hours
 
     # Retention
     EVENT_RETENTION_DAYS: int = 90

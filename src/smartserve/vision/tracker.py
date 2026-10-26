@@ -229,7 +229,8 @@ class SimpleByteTracker(BaseTracker):
         unmatched_low_dets, remaining_unmatched_track_ids = self._associate(
             detection_pool=low_dets,
             track_pool_ids=unmatched_track_ids,
-            iou_threshold=self.match_threshold * 0.8,  # Slightly lower IoU tolerance for occluded stage
+            iou_threshold=self.match_threshold
+            * 0.8,  # Slightly lower IoU tolerance for occluded stage
         )
 
         # Mark remaining unmatched tracks as missed
@@ -351,9 +352,9 @@ class YOLO26Tracker(BaseTracker):
 
     def __init__(
         self,
-        model_path: str = "yolo11n.pt",
+        model_path: str = "yolo26s.pt",
         tracker_type: str = "bytetrack",
-        confidence_threshold: float = 0.45,
+        confidence_threshold: float = 0.35,
         target_classes: list[str] | None = None,
         device: str | None = None,
         max_trajectory_length: int = 30,
@@ -361,7 +362,7 @@ class YOLO26Tracker(BaseTracker):
         """Initialize YOLO26Tracker.
 
         Args:
-            model_path: Path or tag for YOLO weights (e.g., 'yolo11n.pt').
+            model_path: Path or tag for YOLO weights (default: 'yolo26s.pt').
             tracker_type: 'bytetrack' or 'botsort'.
             confidence_threshold: Minimum detection confidence.
             target_classes: Classes to track (default: ['person']).
@@ -375,9 +376,7 @@ class YOLO26Tracker(BaseTracker):
         self.device = device
         self.max_trajectory_length = max_trajectory_length
 
-        self.tracker_config = (
-            "botsort.yaml" if "bot" in self.tracker_type else "bytetrack.yaml"
-        )
+        self.tracker_config = "botsort.yaml" if "bot" in self.tracker_type else "bytetrack.yaml"
         self._model: Any | None = None
         self._trajectories: dict[int, deque[tuple[float, float]]] = {}
         self.frame_count: int = 0
@@ -388,7 +387,9 @@ class YOLO26Tracker(BaseTracker):
             try:
                 from ultralytics import YOLO
 
-                logger.info("Loading YOLO tracker model %s on device=%s", self.model_path, self.device)
+                logger.info(
+                    "Loading YOLO tracker model %s on device=%s", self.model_path, self.device
+                )
                 self._model = YOLO(self.model_path)
             except Exception as e:
                 logger.error("Failed to load YOLO model for tracking: %s", e)
@@ -500,7 +501,9 @@ class MockTracker(BaseTracker):
         self.match_iou_threshold = match_iou_threshold
         self.max_age = max_age
         self._next_id: int = 1
-        self._active_tracks: dict[int, tuple[BoundingBox, int, deque]] = {}  # id -> (bbox, missed_count, traj)
+        self._active_tracks: dict[
+            int, tuple[BoundingBox, int, deque]
+        ] = {}  # id -> (bbox, missed_count, traj)
 
     def reset(self) -> None:
         """Reset mock tracker."""

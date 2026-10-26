@@ -49,7 +49,9 @@ def test_missing_video_source_raises_error():
 
 def test_successful_video_ingestion(temp_video_file):
     """Verify pipeline opens synthetic video and yields valid FramePackets."""
-    pipeline = VideoCapturePipeline(source=temp_video_file, camera_id="CAM-TEST", sample_rate_hz=None)
+    pipeline = VideoCapturePipeline(
+        source=temp_video_file, camera_id="CAM-TEST", sample_rate_hz=None
+    )
     assert pipeline.open() is True
     assert pipeline.status == CameraStatus.CONNECTED
     assert pipeline.is_opened is True
@@ -72,7 +74,9 @@ def test_successful_video_ingestion(temp_video_file):
 
 def test_frame_sampling_rate_limits_throughput(temp_video_file):
     """Verify sample_rate_hz samples frames without crash."""
-    pipeline = VideoCapturePipeline(source=temp_video_file, camera_id="CAM-SAMPLED", sample_rate_hz=5.0)
+    pipeline = VideoCapturePipeline(
+        source=temp_video_file, camera_id="CAM-SAMPLED", sample_rate_hz=5.0
+    )
     assert pipeline.open() is True
 
     packets = list(pipeline.stream_frames())

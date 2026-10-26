@@ -24,14 +24,18 @@ def test_normalize_coordinates_clamping_and_order():
     assert bbox.is_normalized is True
 
     # Out of bounds clamping
-    bbox_clamped = normalize_coordinates(x1=-50, y1=-10, x2=1500, y2=800, frame_width=1000, frame_height=500)
+    bbox_clamped = normalize_coordinates(
+        x1=-50, y1=-10, x2=1500, y2=800, frame_width=1000, frame_height=500
+    )
     assert bbox_clamped.x1 == 0.0
     assert bbox_clamped.y1 == 0.0
     assert bbox_clamped.x2 == 1.0
     assert bbox_clamped.y2 == 1.0
 
     # Inverted coordinates (x1 > x2) should be swapped automatically
-    bbox_inverted = normalize_coordinates(x1=300, y1=400, x2=100, y2=200, frame_width=1000, frame_height=500)
+    bbox_inverted = normalize_coordinates(
+        x1=300, y1=400, x2=100, y2=200, frame_width=1000, frame_height=500
+    )
     assert bbox_inverted.x1 == 0.1
     assert bbox_inverted.x2 == 0.3
     assert bbox_inverted.y1 == 0.4
@@ -78,7 +82,7 @@ def test_mock_detector_interface_compliance():
 
 def test_yolo_detector_input_validation():
     """Verify YOLO26Detector rejects invalid frame input with actionable ValueError."""
-    detector = YOLO26Detector(model_path="yolo11n.pt")
+    detector = YOLO26Detector(model_path="yolo26n.pt")
 
     with pytest.raises(ValueError, match="numpy.ndarray"):
         detector.detect(None)
